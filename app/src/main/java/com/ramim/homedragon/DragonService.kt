@@ -15,6 +15,8 @@ import android.graphics.BitmapFactory
 import android.graphics.PixelFormat
 import android.hardware.display.DisplayManager
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.os.IBinder
 import android.provider.Settings
 import android.view.Display
@@ -44,6 +46,8 @@ class DragonService : Service() {
     var view: DragonView? = null
         private set
     private var screenActive = true
+    private val handler = Handler(Looper.getMainLooper())
+    private val recheckTask = Runnable { IconRegistry.recheck?.invoke() }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(c: Context, i: Intent) {
@@ -54,6 +58,11 @@ class DragonService : Service() {
                 Intent.ACTION_USER_PRESENT -> screenActive = true
             }
             apply()
+            if (i.action != Intent.ACTION_SCREEN_OFF) {
+                // After unlock the icon finder may still think the home screen is covered: ask it to look again a few times.
+                handler.removeCallbacks(recheckTask)
+                for (d in longArrayOf(300, 900, 2000, 4000, 8000)) handler.postDelayed(recheckTask, d)
+            }
         }
     }
 
@@ -180,6 +189,7 @@ class DragonService : Service() {
     }
 
     override fun onDestroy() {
+        handler.removeCallbacks(recheckTask)
         instance = null
         IconRegistry.listener = null
         IconRegistry.swipeListener = null

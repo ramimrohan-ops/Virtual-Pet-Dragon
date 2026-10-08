@@ -12,6 +12,7 @@ object IconRegistry {
     @Volatile var launcherPkg: String? = null
     var listener: (() -> Unit)? = null                  // always called on the main thread
     var swipeListener: (() -> Unit)? = null             // launcher page is scrolling sideways (main thread)
+    var recheck: (() -> Unit)? = null                   // asks the icon finder to look again at what is in front (e.g. right after unlock)
 }
 
 /** Flame colours: up to 6, from the hot core to the cooled tip. The default is the original blue flame. */

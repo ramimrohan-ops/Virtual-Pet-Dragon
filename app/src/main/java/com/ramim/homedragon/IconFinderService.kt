@@ -39,10 +39,12 @@ class IconFinderService : AccessibilityService() {
         val home = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
         IconRegistry.launcherPkg = packageManager.resolveActivity(home, 0)?.activityInfo?.packageName
         IconRegistry.serviceActive = true
+        IconRegistry.recheck = { handler.post { recheckHome() } }
         IconRegistry.listener?.invoke()
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
+        IconRegistry.recheck = null
         IconRegistry.serviceActive = false
         IconRegistry.icons = emptyList()
         IconRegistry.listener?.invoke()
@@ -81,6 +83,23 @@ class IconFinderService : AccessibilityService() {
         } catch (_: Exception) {
         }
         return null
+    }
+
+    /**
+     * Look again at what is in front. Called a few times after the phone is unlocked: while the lock screen is up the
+     * launcher window is unreadable, so "home" was set to false, and the window change that follows the unlock can
+     * arrive before the launcher is readable again. Without this the dragon stayed hidden until the app was restarted.
+     */
+    private fun recheckHome() {
+        if (!IconRegistry.serviceActive) return
+        val byWindows = homeFromWindows()
+        if (byWindows != null) {
+            setHome(byWindows)
+        } else {
+            val root = try { rootInActiveWindow } catch (e: Exception) { null }
+            if (root?.packageName?.toString() == IconRegistry.launcherPkg && !recents) setHome(true)
+        }
+        queueScan()
     }
 
     private fun setHome(h: Boolean) {
@@ -206,6 +225,7 @@ class IconFinderService : AccessibilityService() {
         recentsNode = nowRecents
         if (found.size >= 4 && !sawRecents) {
             IconRegistry.icons = found
+            if (!IconRegistry.onHome) IconRegistry.onHome = true   // the front window is the launcher and shows its icons: it is the home screen
             IconRegistry.listener?.invoke()
         }
         if (changed) refreshHome()
