@@ -163,7 +163,9 @@ class IconFinderService : AccessibilityService() {
             }
             val isWidget = cls.contains("WidgetHostView")
             val labelled = !n.text.isNullOrEmpty() || !n.contentDescription.isNullOrEmpty()
-            val isIconNode = (n.isClickable || n.isLongClickable) && labelled
+            // One UI Home and others expose icons as BubbleTextView / IconView nodes that are not always flagged clickable.
+            val iconClass = cls.contains("BubbleTextView") || cls.contains("IconView") || cls.contains("AppIcon")
+            val isIconNode = (n.isClickable || n.isLongClickable || iconClass) && labelled
             if (n.isVisibleToUser && (isWidget || isIconNode)) {
                 n.getBoundsInScreen(b)
                 val w = b.width().toFloat()

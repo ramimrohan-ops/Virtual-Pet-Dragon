@@ -479,7 +479,8 @@ class MainActivity : Activity() {
 
     private fun openAccessibilitySettings() {
         startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-        Toast.makeText(this, "Open Home Dragon icon finder and switch it on.", Toast.LENGTH_LONG).show()
+        val where = if (isSamsung()) "Accessibility > Installed apps" else "Accessibility"
+        Toast.makeText(this, "In $where, open Home Dragon icon finder and switch it on. If the switch is greyed out: Settings > Apps > Home Dragon > \u22EE > Allow restricted settings.", Toast.LENGTH_LONG).show()
     }
 
     private var disclosureShowing = false
@@ -546,12 +547,19 @@ class MainActivity : Activity() {
         window.decorView.postDelayed({ refresh() }, 500)
     }
 
+    private fun isSamsung() = Build.MANUFACTURER.equals("samsung", ignoreCase = true)
+
     private fun openBackgroundSettings() {
         // Battery: open the system battery list (no special permission needed). The user picks Home Dragon and "No restrictions".
         try {
             startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
         } catch (e: Exception) {
             try { startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName"))) } catch (_: Exception) {}
+        }
+        if (isSamsung()) {
+            // Samsung One UI: Battery > Background usage limits > Never sleeping apps.
+            Toast.makeText(this, "Samsung: Settings > Battery > Background usage limits > Never sleeping apps > add Home Dragon. Also turn off Put unused apps to sleep.", Toast.LENGTH_LONG).show()
+            return
         }
         // HyperOS / MIUI: Autostart screen (not available on every build, so failure is fine).
         try {

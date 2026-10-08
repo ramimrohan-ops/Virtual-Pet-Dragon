@@ -214,3 +214,9 @@ Limits: touch cannot wake the dragon (the overlay is not touchable); it wakes by
 - Launcher icon: the new dragon-head logo (adaptive icon, purple background with glow rings), drawn in `res/drawable-nodpi/ic_launcher_fg.png`.
 - Notification: white dragon-head silhouette as the small icon (`ic_stat_dragon.png`) and the full-colour dragon on white as the large picture (`ic_notif_large.png`).
 - No behaviour changes.
+
+## v2.24 - Samsung One UI
+Best-guess Samsung support (not tested on a Samsung phone):
+- Setup help on Samsung: battery step points to Background usage limits > Never sleeping apps; accessibility step points to Accessibility > Installed apps and mentions Allow restricted settings if the switch is greyed out.
+- Icon finder also accepts One UI Home icon views (BubbleTextView / IconView) that are not flagged clickable.
+- No other behaviour changes.
