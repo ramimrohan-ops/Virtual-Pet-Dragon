@@ -28,6 +28,13 @@ jobs:
             echo "UPLOAD_KEY_ALIAS=$KS_ALIAS" >> "$GITHUB_ENV"
             echo "UPLOAD_KEY_PASSWORD=$KS_KEYPASS" >> "$GITHUB_ENV"
             echo "Signing with the upload key"
+            sz=$(stat -c %s "$RUNNER_TEMP/upload.jks")
+            fp=$(keytool -list -keystore "$RUNNER_TEMP/upload.jks" -storepass "$KS_PASS" -alias "$KS_ALIAS" 2>&1 | tr '\n' ' ' | sed 's/%/%25/g')
+            echo "::notice title=Key check::decoded file size $sz bytes (expected 2670); b64 text length ${#KS_B64} (expected 3560); keytool: $fp"
+            if ! keytool -list -keystore "$RUNNER_TEMP/upload.jks" -storepass "$KS_PASS" -alias "$KS_ALIAS" >/dev/null 2>&1; then
+              echo "::error title=Key check failed::The keystore secret or its password is wrong. Decoded size $sz bytes (expected 2670), b64 length ${#KS_B64} (expected 3560)."
+              exit 1
+            fi
           else
             echo "No upload key secrets: signing with the debug key"
           fi
