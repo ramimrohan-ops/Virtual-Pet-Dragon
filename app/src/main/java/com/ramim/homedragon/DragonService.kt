@@ -11,6 +11,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ServiceInfo
+import android.graphics.BitmapFactory
 import android.graphics.PixelFormat
 import android.hardware.display.DisplayManager
 import android.os.Build
@@ -200,7 +201,8 @@ class DragonService : Service() {
             this, 1, Intent(this, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE
         )
         return NotificationCompat.Builder(this, CHANNEL)
-            .setSmallIcon(R.drawable.ic_launcher)
+            .setSmallIcon(R.drawable.ic_stat_dragon)
+            .setLargeIcon(BitmapFactory.decodeResource(resources, R.drawable.ic_notif_large))
             .setContentTitle("Dragon is on your home screen")
             .setContentIntent(open)
             .addAction(0, "Stop", stop)

@@ -209,3 +209,8 @@ The feet are the anchor and the icon top is the ground. While asleep the frame r
 **Flame colours.** The "Flame colours" card has a live preview, up to 6 colours, hue/saturation/brightness picker, hex field, ready palettes and "Reset to blue". Blue stays the default. The colours blend from hot core to cooled tip and tint the flame, glow and smoke.
 
 Limits: touch cannot wake the dragon (the overlay is not touchable); it wakes by timer, or fades out and re-lands on a page swipe or app switch. Scratching is a simple two-segment arm rub.
+
+## v2.23 - new app logo
+- Launcher icon: the new dragon-head logo (adaptive icon, purple background with glow rings), drawn in `res/drawable-nodpi/ic_launcher_fg.png`.
+- Notification: white dragon-head silhouette as the small icon (`ic_stat_dragon.png`) and the full-colour dragon on white as the large picture (`ic_notif_large.png`).
+- No behaviour changes.
