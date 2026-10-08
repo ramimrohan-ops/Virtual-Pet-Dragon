@@ -9,7 +9,7 @@ The release build is signed with a private upload key when these four GitHub Sec
 | UPLOAD_KEYSTORE_BASE64 | the whole text of `upload-keystore.base64.txt` |
 | UPLOAD_STORE_PASSWORD | the store password |
 | UPLOAD_KEY_ALIAS | the key alias |
-| UPLOAD_KEY_PASSWORD | the key password |
+| UPLOAD_KEY_PASSWORD | the store password again (PKCS12 keys use the store password; the build handles this) |
 
 Without them the build uses the old debug key (fine for your own phone, rejected by Play).
 Keep the keystore file and passwords backed up. In Play Console turn on Play App Signing and upload the `.aab`
