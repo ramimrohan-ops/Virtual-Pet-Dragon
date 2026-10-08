@@ -13,11 +13,28 @@ jobs:
           java-version: 17
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.9'
-      - name: Build release APK
+          gradle-version: '8.13'
+      - name: Upload key (only when the secrets exist)
+        env:
+          KS_B64: ${{ secrets.UPLOAD_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.UPLOAD_STORE_PASSWORD }}
+          KS_ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
+          KS_KEYPASS: ${{ secrets.UPLOAD_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+            echo "UPLOAD_KEYSTORE_FILE=$RUNNER_TEMP/upload.jks" >> "$GITHUB_ENV"
+            echo "UPLOAD_STORE_PASSWORD=$KS_PASS" >> "$GITHUB_ENV"
+            echo "UPLOAD_KEY_ALIAS=$KS_ALIAS" >> "$GITHUB_ENV"
+            echo "UPLOAD_KEY_PASSWORD=$KS_KEYPASS" >> "$GITHUB_ENV"
+            echo "Signing with the upload key"
+          else
+            echo "No upload key secrets: signing with the debug key"
+          fi
+      - name: Build release APK and AAB
         run: |
           set -o pipefail
-          gradle assembleRelease --no-daemon --stacktrace --console=plain 2>&1 | tee build.log || {
+          gradle assembleRelease bundleRelease --no-daemon --stacktrace --console=plain 2>&1 | tee build.log || {
             msg=$(grep -E '^e: |^w: .*(Unresolved|error)|What went wrong|FAILURE' -A1 build.log | head -60 | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')
             echo "::error title=Build errors::$msg"
             exit 1
@@ -26,3 +43,7 @@ jobs:
         with:
           name: HomeDragon-release-apk
           path: app/build/outputs/apk/release/app-release.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HomeDragon-release-aab
+          path: app/build/outputs/bundle/release/app-release.aab

@@ -120,6 +120,18 @@ Four sliders, all in steps of 10% (Quality and Particles 10-100%, Size and Speed
 
 The home-screen dragon is hidden and stopped for as long as the Home Dragon app is open. The previews only animate while you drag a slider and hold the last picture otherwise. Pressing Home brings the dragon back at once. The preview fire is a separate, simplified copy of the real fire effect with the same colours and particle counts.
 
+## v2.22 changes
+
+| Change | Detail |
+|---|---|
+| Signing | Release is signed with a private upload key from GitHub Secrets when present, otherwise the debug key (see PLAY_STORE.md) |
+| API level | compileSdk and targetSdk 36 (Android Gradle plugin 8.11.1, Gradle 8.13) |
+| App bundle | The build also makes an .aab (artifact HomeDragon-release-aab) |
+| Icon finder disclosure | New in-app screen with Agree and continue / No thanks before Android Accessibility settings open. The service switches itself off until you agree |
+| Battery | The battery-exemption permission was removed; the app opens the system battery list instead |
+| Service description | Reworded to match exactly what the code does |
+| Policy files | PRIVACY.md and PLAY_STORE.md added |
+
 ## v2.21 changes
 
 | Change | Detail |

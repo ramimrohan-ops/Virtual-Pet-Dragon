@@ -5,14 +5,14 @@ plugins {
 
 android {
     namespace = "com.ramim.homedragon"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.ramim.homedragon"
         minSdk = 29
-        targetSdk = 35
-        versionCode = 31
-        versionName = "2.21"
+        targetSdk = 36
+        versionCode = 32
+        versionName = "2.22"
     }
 
     // Fixed debug key so every new build installs over the previous one without uninstalling.
@@ -23,12 +23,21 @@ android {
             keyAlias = "androiddebugkey"
             keyPassword = "android"
         }
-        // Release uses the same fixed key, so it installs over the debug build and over later releases.
+        // Release: signed with the private upload key when the build has it (GitHub Secrets, see PLAY_STORE.md).
+        // Without those secrets it falls back to the fixed debug key, so test builds still install over each other.
         create("release") {
-            storeFile = file("debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
+            val ksPath = System.getenv("UPLOAD_KEYSTORE_FILE")
+            if (!ksPath.isNullOrEmpty() && file(ksPath).exists()) {
+                storeFile = file(ksPath)
+                storePassword = System.getenv("UPLOAD_STORE_PASSWORD")
+                keyAlias = System.getenv("UPLOAD_KEY_ALIAS")
+                keyPassword = System.getenv("UPLOAD_KEY_PASSWORD")
+            } else {
+                storeFile = file("debug.keystore")
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
         }
     }
 

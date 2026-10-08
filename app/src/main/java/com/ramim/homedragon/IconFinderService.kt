@@ -26,6 +26,16 @@ class IconFinderService : AccessibilityService() {
 
     override fun onServiceConnected() {
         super.onServiceConnected()
+        // Not allowed to work until the user has agreed to the in-app disclosure: switch off and show it.
+        if (!Prefs.a11yConsent(this)) {
+            try {
+                startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                    .putExtra("a11y_disclosure", true))
+            } catch (_: Exception) {
+            }
+            disableSelf()
+            return
+        }
         val home = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
         IconRegistry.launcherPkg = packageManager.resolveActivity(home, 0)?.activityInfo?.packageName
         IconRegistry.serviceActive = true
@@ -82,6 +92,7 @@ class IconFinderService : AccessibilityService() {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
+        if (!IconRegistry.serviceActive) return          // not connected (no consent yet)
         val launcher = IconRegistry.launcherPkg ?: return
         val type = event.eventType
 

@@ -380,10 +380,7 @@ class MainActivity : Activity() {
         val r1 = SetupRow("Draw over other apps", "Lets the dragon appear on your home screen") {
             startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")))
         }
-        val r2 = SetupRow("Icon finder", "Lets the dragon see where your icons are") {
-            startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-            Toast.makeText(this, "Open Home Dragon icon finder and switch it on.", Toast.LENGTH_LONG).show()
-        }
+        val r2 = SetupRow("Icon finder", "Lets the dragon see where your icons are") { onIconFinderTapped() }
         val r3 = SetupRow("Background running", "Keeps the dragon alive when the screen is off") { openBackgroundSettings() }
         setupRows.addAll(listOf(r1, r2, r3))
         setup.addView(r1.view); setup.addView(r2.view); setup.addView(r3.view)
@@ -458,11 +455,60 @@ class MainActivity : Activity() {
         DragonService.appOpen = true
         DragonService.instance?.refreshHold()
         try { flamePreview?.start() } catch (_: Throwable) {}
+        // the icon finder was switched on in Android's settings before the user agreed here: show the disclosure now
+        if (intent?.getBooleanExtra("a11y_disclosure", false) == true) {
+            intent.removeExtra("a11y_disclosure")
+            if (!Prefs.a11yConsent(this)) showA11yDisclosure()
+        }
         try {
             if (setupRows.size == 3) refresh()
         } catch (t: Throwable) {
             showError("The status refresh failed:", Log.getStackTraceString(t))
         }
+    }
+
+    override fun onNewIntent(newIntent: Intent) {
+        super.onNewIntent(newIntent)
+        setIntent(newIntent)
+    }
+
+    /** Prominent disclosure first (Google Play requirement); Android's Accessibility settings open only after the user agrees. */
+    private fun onIconFinderTapped() {
+        if (Prefs.a11yConsent(this)) openAccessibilitySettings() else showA11yDisclosure()
+    }
+
+    private fun openAccessibilitySettings() {
+        startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+        Toast.makeText(this, "Open Home Dragon icon finder and switch it on.", Toast.LENGTH_LONG).show()
+    }
+
+    private var disclosureShowing = false
+
+    private fun showA11yDisclosure() {
+        if (disclosureShowing) return
+        disclosureShowing = true
+        val msg = "Home Dragon uses Android's Accessibility service for one thing: to find where the icons on your home screen are, " +
+            "and to know when the home screen is in front, so the dragon can sit on the icons, breathe fire at them and hide when you open another app.\n\n" +
+            "What it looks at:\n" +
+            "\u2022 the position and size of home-screen icons\n" +
+            "\u2022 whether an icon has a label (not the label itself)\n" +
+            "\u2022 the name of the app that is in front, and technical screen names of your launcher (to tell home from recent apps)\n\n" +
+            "What it does not do:\n" +
+            "\u2022 it does not read or store text, messages, passwords or anything you type\n" +
+            "\u2022 it does not tap, type or control anything\n" +
+            "\u2022 nothing leaves your phone: the app has no internet access and shares no data\n\n" +
+            "You can switch it off any time in Android Settings > Accessibility."
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Allow the icon finder?")
+            .setMessage(msg)
+            .setCancelable(true)
+            .setPositiveButton("Agree and continue") { _, _ ->
+                Prefs.setA11yConsent(this, true)
+                openAccessibilitySettings()
+            }
+            .setNegativeButton("No thanks", null)
+            .setOnDismissListener { disclosureShowing = false }
+            .show()
     }
 
     private fun a11yEnabled(): Boolean {
@@ -501,13 +547,11 @@ class MainActivity : Activity() {
     }
 
     private fun openBackgroundSettings() {
-        // Battery: ask for "No restrictions".
+        // Battery: open the system battery list (no special permission needed). The user picks Home Dragon and "No restrictions".
         try {
-            startActivity(
-                Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:$packageName"))
-            )
-        } catch (e: Exception) {
             startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+        } catch (e: Exception) {
+            try { startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName"))) } catch (_: Exception) {}
         }
         // HyperOS / MIUI: Autostart screen (not available on every build, so failure is fine).
         try {
@@ -516,6 +560,6 @@ class MainActivity : Activity() {
             )))
         } catch (_: Exception) {
         }
-        Toast.makeText(this, "Also lock Home Dragon in the recent apps list.", Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "In the battery list switch to All apps, choose Home Dragon, then No restrictions. Also lock it in the recent apps list.", Toast.LENGTH_LONG).show()
     }
 }
