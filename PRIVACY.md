@@ -37,6 +37,6 @@ You can switch the icon finder off at any time in Android Settings > Accessibili
 
 ## Contact
 
-Developer: Ramim. Contact email: [ADD YOUR CONTACT EMAIL HERE BEFORE PUBLISHING]
+Developer: Ramim. Contact email: ramimrohan@gmail.com
 
 If this policy changes, the new version will be posted at the same address with a new date.

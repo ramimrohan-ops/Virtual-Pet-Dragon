@@ -17,7 +17,8 @@ from the `HomeDragon-release-aab` artifact. Builds signed with the upload key in
 build signed with the debug key once.
 
 ## 2. Files for the store
-- Privacy policy link: the address of `PRIVACY.md` in this repo (open it on GitHub and copy the address)
+- Privacy policy link: https://github.com/ramimrohan-ops/Virtual-Pet-Dragon/blob/main/PRIVACY.md
+- App icon (512x512): `play-icon-512.png` (in the store-files zip)
 - App bundle: artifact `HomeDragon-release-aab`; APK for your own phone: `HomeDragon-release-apk`
 
 ## 3. App content answers
@@ -45,3 +46,29 @@ accessibility service (disclosed above). Battery exemption is NOT requested; the
 ## 4. Before production
 New personal developer accounts may need a closed test with 12 or more testers for 14 days first. Check the
 Play Console dashboard for the exact requirement on your account.
+
+## 5. Store listing text (copy and paste)
+**App name:** Home Dragon
+
+**Short description (80 max):** A cute pet dragon that lives on your home screen and plays with your icons.
+
+**Full description:**
+Home Dragon puts a friendly pet dragon on your Android home screen. It sits on your app icons, hops between them, flies
+across the screen and breathes harmless cartoon fire that fades away. Nothing is ever changed on your icons.
+
+- Lives on your home screen and fades away when you open an app
+- Hops, flies and perches on your icons and widgets
+- Size, speed, frame rate and effects sliders, flame colours and see-through body and wings
+- Optional Icon finder (accessibility permission, always asked first) lets the dragon find where your icons are
+- No account, no ads, no internet access, no data collected
+
+**Category:** Personalization (or Entertainment). **Contact email:** ramimrohan@gmail.com
+
+## 6. Videos to record (screen recording on your phone, about 30 to 60 seconds each)
+**Video 1, foreground service:** open Home Dragon, tap Start dragon, pull down the notification shade to show the
+"Dragon is on your home screen" notification, go to the home screen and show the dragon, then tap Stop in the
+notification.
+
+**Video 2, accessibility:** open Home Dragon, scroll to Setup, tap the Icon finder row, show the "Allow the icon finder?"
+dialog and tap Agree and continue, then Android's Accessibility settings with Home Dragon switched on, go to the home
+screen and show the dragon sitting on icons. Upload each video to YouTube as Unlisted and paste the link in Play Console.
